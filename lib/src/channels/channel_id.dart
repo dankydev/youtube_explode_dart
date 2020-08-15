@@ -8,11 +8,7 @@ class ChannelId with EquatableMixin {
   final String value;
 
   /// Initializes an instance of [ChannelId]
-  ChannelId(String value) : value = parseChannelId(value) {
-    if (this.value == null) {
-      throw ArgumentError.value(value, 'value', 'Invalid channel id');
-    }
-  }
+  ChannelId(String value) : value = parseChannelId(value);
 
   /// Returns true if the given id is a valid channel id.
   static bool validateChannelId(String id) {
@@ -32,10 +28,10 @@ class ChannelId with EquatableMixin {
   }
 
   /// Parses a channel id from an url.
-  /// Returns null if the username is not found.
+  /// Throws an argument error if the channel is not found
   static String parseChannelId(String url) {
-    if (url.isNullOrWhiteSpace) {
-      return null;
+    if (url.isWhitespace) {
+      throw ArgumentError.value(url, 'url', 'Invalid channel id');
     }
 
     if (validateChannelId(url)) {
@@ -45,10 +41,10 @@ class ChannelId with EquatableMixin {
     var regMatch = RegExp(r'youtube\..+?/channel/(.*?)(?:\?|&|/|$)')
         .firstMatch(url)
         ?.group(1);
-    if (!regMatch.isNullOrWhiteSpace && validateChannelId(regMatch)) {
+    if (!regMatch?.isNullOrWhiteSpace && validateChannelId(regMatch)) {
       return regMatch;
     }
-    return null;
+    throw ArgumentError.value(url, 'url', 'Invalid channel id');
   }
 
   ///  Converts [obj] to a [ChannelId] by calling .toString on that object.

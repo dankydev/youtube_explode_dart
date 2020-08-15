@@ -57,6 +57,9 @@ linter:
     - prefer_single_quotes
     - use_function_type_syntax_for_parameters
 
+
 analyzer:
+  enable-experiment:
+    - non-nullable
   exclude:
     - example\**

@@ -17,17 +17,13 @@ class PlaylistId with EquatableMixin {
   final String value;
 
   /// Initializes an instance of [PlaylistId]
-  PlaylistId(String idOrUrl) : value = parsePlaylistId(idOrUrl) {
-    if (value == null) {
-      throw ArgumentError.value(idOrUrl, 'idOrUrl', 'Invalid url');
-    }
-  }
+  PlaylistId(String idOrUrl) : value = parsePlaylistId(idOrUrl);
 
   /// Returns true if the given [playlistId] is valid.
   static bool validatePlaylistId(String playlistId) {
     playlistId = playlistId.toUpperCase();
 
-    if (playlistId.isNullOrWhiteSpace) {
+    if (playlistId.isWhitespace) {
       return false;
     }
 
@@ -61,9 +57,10 @@ class PlaylistId with EquatableMixin {
 
   /// Parses a playlist [url] returning its id.
   /// If the [url] is a valid it is returned itself.
+  /// Throws an [ArgumentException] if this fails.
   static String parsePlaylistId(String url) {
-    if (url.isNullOrWhiteSpace) {
-      return null;
+    if (url.isWhitespace) {
+      throw ArgumentError.value(url, 'url', 'Invalid url');
     }
 
     if (validatePlaylistId(url)) {
@@ -71,28 +68,28 @@ class PlaylistId with EquatableMixin {
     }
 
     var regMatch = _regMatchExp.firstMatch(url)?.group(1);
-    if (!regMatch.isNullOrWhiteSpace && validatePlaylistId(regMatch)) {
+    if (!regMatch.isNullOrWhiteSpace && validatePlaylistId(regMatch!)) {
       return regMatch;
     }
 
     var compositeMatch = _compositeMatchExp.firstMatch(url)?.group(1);
     if (!compositeMatch.isNullOrWhiteSpace &&
-        validatePlaylistId(compositeMatch)) {
+        validatePlaylistId(compositeMatch!)) {
       return compositeMatch;
     }
 
     var shortCompositeMatch = _shortCompositeMatchExp.firstMatch(url)?.group(1);
     if (!shortCompositeMatch.isNullOrWhiteSpace &&
-        validatePlaylistId(shortCompositeMatch)) {
+        validatePlaylistId(shortCompositeMatch!)) {
       return shortCompositeMatch;
     }
 
     var embedCompositeMatch = _embedCompositeMatchExp.firstMatch(url)?.group(1);
     if (!embedCompositeMatch.isNullOrWhiteSpace &&
-        validatePlaylistId(embedCompositeMatch)) {
+        validatePlaylistId(embedCompositeMatch!)) {
       return embedCompositeMatch;
     }
-    return null;
+    throw ArgumentError.value(url, 'url', 'Invalid url');
   }
 
   @override

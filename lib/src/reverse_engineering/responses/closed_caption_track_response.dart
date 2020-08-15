@@ -7,7 +7,7 @@ import '../youtube_http_client.dart';
 class ClosedCaptionTrackResponse {
   final xml.XmlDocument _root;
 
-  Iterable<ClosedCaption> _closedCaptions;
+  Iterable<ClosedCaption>? _closedCaptions;
 
   ///
   Iterable<ClosedCaption> get closedCaptions => _closedCaptions ??=
@@ -44,21 +44,21 @@ class ClosedCaptionTrackResponse {
 class ClosedCaption {
   final xml.XmlElement _root;
 
-  Duration _offset;
-  Duration _duration;
-  Duration _end;
-  Iterable<ClosedCaptionPart> _parts;
+  Duration? _offset;
+  Duration? _duration;
+  Duration? _end;
+  Iterable<ClosedCaptionPart>? _parts;
 
   ///
   String get text => _root.text;
 
   ///
   Duration get offset => _offset ??=
-      Duration(milliseconds: int.parse(_root.getAttribute('t') ?? 0));
+      Duration(milliseconds: int.parse(_root.getAttribute('t') ?? '0'));
 
   ///
   Duration get duration => _duration ??=
-      Duration(milliseconds: int.parse(_root.getAttribute('d') ?? 0));
+      Duration(milliseconds: int.parse(_root.getAttribute('d') ?? '0'));
 
   ///
   Duration get end => _end ??= offset + duration;
@@ -74,7 +74,7 @@ class ClosedCaption {
 class ClosedCaptionPart {
   final xml.XmlElement _root;
 
-  Duration _offset;
+  Duration? _offset;
 
   ///
   String get text => _root.text;

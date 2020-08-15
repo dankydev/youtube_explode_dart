@@ -13,11 +13,11 @@ class EmbedPage {
       RegExp(r"yt\.setConfig\({'PLAYER_CONFIG':(.*)}\);");
 
   final Document _root;
-  _PlayerConfig _playerConfig;
-  String __playerConfigJson;
+  _PlayerConfig? _playerConfig;
+  String? __playerConfigJson;
 
   ///
-  _PlayerConfig get playerconfig {
+  _PlayerConfig? get playerconfig {
     if (_playerConfig != null) {
       return _playerConfig;
     }
@@ -28,7 +28,7 @@ class EmbedPage {
     return _playerConfig = _PlayerConfig(json.decode(playerConfigJson));
   }
 
-  String get _playerConfigJson => __playerConfigJson ??= _root
+  String? get _playerConfigJson => __playerConfigJson ??= _root
       .getElementsByTagName('script')
       .map((e) => e.text)
       .map((e) => _playerConfigExp.firstMatch(e)?.group(1))

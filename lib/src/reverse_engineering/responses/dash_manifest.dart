@@ -9,8 +9,7 @@ class DashManifest {
   static final _urlSignatureExp = RegExp(r'/s/(.*?)(?:/|$)');
 
   final xml.XmlDocument _root;
-  Iterable<_StreamInfo> _streams;
-
+  Iterable<_StreamInfo>? _streams;
 
   ///
   Iterable<_StreamInfo> get streams => _streams ??= _root
@@ -38,7 +37,7 @@ class DashManifest {
   }
 
   ///
-  static String getSignatureFromUrl(String url) =>
+  static String? getSignatureFromUrl(String url) =>
       _urlSignatureExp.firstMatch(url)?.group(1);
 }
 
@@ -57,15 +56,15 @@ class _StreamInfo extends StreamInfoProvider {
   String get url => _root.getAttribute('BaseURL');
 
   @override
-  int get contentLength => int.parse(_root.getAttribute('contentLength') ??
-      _contentLenExp.firstMatch(url).group(1));
+  int? get contentLength => int.parse(_root.getAttribute('contentLength') ??
+      _contentLenExp.firstMatch(url)!.group(1)!);
 
   @override
   int get bitrate => int.parse(_root.getAttribute('bandwidth'));
 
   @override
-  String get container =>
-      Uri.decodeFull(_containerExp.firstMatch(url).group(1));
+  String? get container =>
+      Uri.decodeFull(_containerExp.firstMatch(url)!.group(1)!);
 
   bool get isAudioOnly =>
       _root.findElements('AudioChannelConfiguration').isNotEmpty;

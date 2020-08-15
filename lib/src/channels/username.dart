@@ -6,12 +6,7 @@ class Username {
   final String value;
 
   /// Initializes an instance of [Username].
-  Username(String urlOrUsername) : value = parseUsername(urlOrUsername) {
-    if (value == null) {
-      throw ArgumentError.value(
-          urlOrUsername, 'urlOrUsername', 'Invalid username');
-    }
-  }
+  Username(String urlOrUsername) : value = parseUsername(urlOrUsername);
 
   /// Returns true if the given username is a valid username.
   static bool validateUsername(String name) {
@@ -27,9 +22,10 @@ class Username {
   }
 
   /// Parses a username from a url.
+  /// Throws an argument error if the username is not found
   static String parseUsername(String nameOrUrl) {
     if (nameOrUrl.isNullOrWhiteSpace) {
-      return null;
+      throw ArgumentError.value(nameOrUrl, 'nameOrUrl', 'Invalid username');
     }
 
     if (validateUsername(nameOrUrl)) {
@@ -39,10 +35,10 @@ class Username {
     var regMatch = RegExp(r'youtube\..+?/user/(.*?)(?:\?|&|/|$)')
         .firstMatch(nameOrUrl)
         ?.group(1);
-    if (!regMatch.isNullOrWhiteSpace && validateUsername(regMatch)) {
+    if (!regMatch.isNullOrWhiteSpace && validateUsername(regMatch!)) {
       return regMatch;
     }
-    return null;
+    throw ArgumentError.value(nameOrUrl, 'nameOrUrl', 'Invalid username');
   }
 
   ///  Converts [obj] to a [Username] by calling .toString on that object.

@@ -14,14 +14,14 @@ import '../youtube_http_client.dart';
 class ChannelUploadPage {
   ///
   final String channelId;
-  final Document _root;
+  final Document? _root;
 
-  _InitialData _initialData;
+  _InitialData? _initialData;
 
   ///
   _InitialData get initialData =>
-      _initialData ??= _InitialData(json.decode(_matchJson(_extractJson(
-          _root
+      _initialData = _InitialData(json.decode(_matchJson(_extractJson(
+          _root!
               .querySelectorAll('script')
               .map((e) => e.text)
               .toList()
@@ -35,7 +35,7 @@ class ChannelUploadPage {
 
   String _matchJson(String str) {
     var bracketCount = 0;
-    int lastI;
+    late int lastI;
     for (var i = 0; i < str.length; i++) {
       lastI = i;
       if (str[i] == '{') {
@@ -52,7 +52,7 @@ class ChannelUploadPage {
   }
 
   ///
-  ChannelUploadPage(this._root, this.channelId, [_InitialData initialData])
+  ChannelUploadPage(this._root, this.channelId, [_InitialData? initialData])
       : _initialData = initialData;
 
   ///
@@ -72,7 +72,6 @@ class ChannelUploadPage {
   ///
   static Future<ChannelUploadPage> get(
       YoutubeHttpClient httpClient, String channelId, String sorting) {
-    assert(sorting != null);
     var url =
         'https://www.youtube.com/channel/$channelId/videos?view=0&sort=$sorting&flow=grid';
     return retry(() async {
@@ -94,9 +93,9 @@ class _InitialData {
 
   /* Cache results */
 
-  List<ChannelVideo> _uploads;
-  String _continuation;
-  String _clickTrackingParams;
+  List<ChannelVideo>? _uploads;
+  String? _continuation;
+  String? _clickTrackingParams;
 
   List<Map<String, dynamic>> getContentContext(Map<String, dynamic> root) {
     if (root['contents'] != null) {
@@ -114,10 +113,10 @@ class _InitialData {
               ['items']
           .cast<Map<String, dynamic>>();
     }
-    throw FatalFailureException('Failed to get initial data context.');
+    throw FatalFailureException('Failed to get initial content context.');
   }
 
-  Map<String, dynamic> getContinuationContext(Map<String, dynamic> root) {
+  Map<String, dynamic>? getContinuationContext(Map<String, dynamic> root) {
     if (_root['contents'] != null) {
       return (_root['contents']['twoColumnBrowseResultsRenderer']['tabs']
               as List<dynamic>)
@@ -142,7 +141,7 @@ class _InitialData {
       ?.map(_parseContent)
       ?.where((e) => e != null)
       ?.toList()
-      ?.cast<ChannelVideo>();
+      ?.cast<ChannelVideo>()!;
 
   String get continuation => _continuation ??=
       getContinuationContext(_root)?.getValue('continuation') ?? '';

@@ -10,11 +10,11 @@ class PlayerResponse {
   // Json parsed map
   final Map<String, dynamic> _root;
 
-  Iterable<StreamInfoProvider> _muxedStreams;
-  Iterable<StreamInfoProvider> _adaptiveStreams;
-  List<StreamInfoProvider> _streams;
-  Iterable<ClosedCaptionTrack> _closedCaptionTrack;
-  String _videoPlayabilityError;
+  Iterable<StreamInfoProvider>? _muxedStreams;
+  Iterable<StreamInfoProvider>? _adaptiveStreams;
+  List<StreamInfoProvider>? _streams;
+  Iterable<ClosedCaptionTrack>? _closedCaptionTrack;
+  String? _videoPlayabilityError;
 
   ///
   String get playabilityStatus => _root['playabilityStatus']['status'];
