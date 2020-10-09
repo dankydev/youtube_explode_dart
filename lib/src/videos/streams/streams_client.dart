@@ -41,9 +41,10 @@ class StreamsClient {
 
     var playerSource =
         await PlayerSource.get(_httpClient, playerConfig.sourceUrl);
-    if (playerSource == null)
+    if (playerSource == null){
       throw VideoUnplayableException.unplayable(videoId,
-          reason: "FUORI DALLA MIA PALUDE");
+          reason: 'FUORI DALLA MIA PALUDE');
+    }
     var cipherOperations = playerSource.getCiperOperations();
 
     var videoInfoResponse = await VideoInfoResponse.get(
@@ -96,9 +97,10 @@ class StreamsClient {
 
     var playerSource =
         await PlayerSource.get(_httpClient, playerConfig.sourceUrl);
-      if (playerSource == null)
-            throw VideoUnplayableException.unplayable(videoId,
-          reason: "FUORI DALLA MIA PALUDE");
+    if (playerSource == null){
+      throw VideoUnplayableException.unplayable(videoId,
+          reason: 'FUORI DALLA MIA PALUDE');
+    }
 
     var cipherOperations = playerSource.getCiperOperations();
 
