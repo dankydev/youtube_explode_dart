@@ -9,8 +9,7 @@ import '../youtube_http_client.dart';
 
 ///
 class EmbedPage {
-  static final _playerConfigExp =
-      RegExp(r"'PLAYER_CONFIG':\s*(\{.*\})\}");
+  static final _playerConfigExp = RegExp(r"'PLAYER_CONFIG':\s*(\{.*\})\}");
 
   final Document _root;
   _PlayerConfig _playerConfig;
@@ -56,5 +55,6 @@ class _PlayerConfig {
 
   _PlayerConfig(this._root);
 
-  String get sourceUrl => 'https://youtube.com${_root['assets']['js']}';
+  String get sourceUrl =>
+      _root != null && _root['assets'] != null ? 'https://youtube.com${_root['assets']['js']}' : null;
 }

@@ -14,12 +14,9 @@ import 'stream_info_provider.dart';
 
 ///
 class WatchPage {
-  static final RegExp _videoLikeExp =
-      RegExp(r'"label"\s*:\s*"([\d,\.]+) likes"');
-  static final RegExp _videoDislikeExp =
-      RegExp(r'"label"\s*:\s*"([\d,\.]+) dislikes"');
-  static final RegExp _visitorInfoLiveExp =
-      RegExp('VISITOR_INFO1_LIVE=([^;]+)');
+  static final RegExp _videoLikeExp = RegExp(r'"label"\s*:\s*"([\d,\.]+) likes"');
+  static final RegExp _videoDislikeExp = RegExp(r'"label"\s*:\s*"([\d,\.]+) dislikes"');
+  static final RegExp _visitorInfoLiveExp = RegExp('VISITOR_INFO1_LIVE=([^;]+)');
   static final RegExp _yscExp = RegExp('YSC=([^;]+)');
   static final _xsfrTokenExp = RegExp(r'"XSRF_TOKEN"\s*:\s*"(.+?)"');
 
@@ -36,67 +33,45 @@ class WatchPage {
   _PlayerConfig _playerConfig;
 
   ///
-  _InitialData get initialData =>
-      _initialData ??= _InitialData(json.decode(_matchJson(_extractJson(
-          _root
-              .querySelectorAll('script')
-              .map((e) => e.text)
-              .toList()
-              .firstWhere((e) => e.contains('window["ytInitialData"] =')),
-          'window["ytInitialData"] ='))));
+  _InitialData get initialData => _initialData ??= _InitialData(json.decode(_matchJson(_extractJson(
+      _root
+          .querySelectorAll('script')
+          .map((e) => e.text)
+          .toList()
+          .firstWhere((e) => e.contains('window["ytInitialData"] =')),
+      'window["ytInitialData"] ='))));
 
   ///
   String get xsfrToken => _xsfrToken ??= _xsfrTokenExp
-      .firstMatch(_root
-          .querySelectorAll('script')
-          .firstWhere((e) => _xsfrTokenExp.hasMatch(e.text))
-          .text)
+      .firstMatch(_root.querySelectorAll('script').firstWhere((e) => _xsfrTokenExp.hasMatch(e.text)).text)
       .group(1);
 
   ///
   bool get isOk => _root.body.querySelector('#player') != null;
 
   ///
-  bool get isVideoAvailable =>
-      _root.querySelector('meta[property="og:url"]') != null;
+  bool get isVideoAvailable => _root.querySelector('meta[property="og:url"]') != null;
 
   ///
-  int get videoLikeCount => int.parse(_videoLikeExp
-          .firstMatch(_root.outerHtml)
-          ?.group(1)
-          ?.stripNonDigits()
-          ?.nullIfWhitespace ??
-      _root
-          .querySelector('.like-button-renderer-like-button')
-          ?.text
-          ?.stripNonDigits()
-          ?.nullIfWhitespace ??
-      '0');
+  int get videoLikeCount =>
+      int.parse(_videoLikeExp.firstMatch(_root.outerHtml)?.group(1)?.stripNonDigits()?.nullIfWhitespace ??
+          _root.querySelector('.like-button-renderer-like-button')?.text?.stripNonDigits()?.nullIfWhitespace ??
+          '0');
 
   ///
-  int get videoDislikeCount => int.parse(_videoDislikeExp
-          .firstMatch(_root.outerHtml)
-          ?.group(1)
-          ?.stripNonDigits()
-          ?.nullIfWhitespace ??
-      _root
-          .querySelector('.like-button-renderer-dislike-button')
-          ?.text
-          ?.stripNonDigits()
-          ?.nullIfWhitespace ??
-      '0');
+  int get videoDislikeCount =>
+      int.parse(_videoDislikeExp.firstMatch(_root.outerHtml)?.group(1)?.stripNonDigits()?.nullIfWhitespace ??
+          _root.querySelector('.like-button-renderer-dislike-button')?.text?.stripNonDigits()?.nullIfWhitespace ??
+          '0');
 
   static final _playerConfigExp = RegExp(r'ytplayer\.config\s*=\s*(\{.*\}\});');
 
   ///
-  _PlayerConfig get playerConfig =>
-      _playerConfig ??= _PlayerConfig(json.decode(_playerConfigExp
-          .firstMatch(_root.getElementsByTagName('html').first.text)
-          ?.group(1)));
+  _PlayerConfig get playerConfig => _playerConfig ??=
+      _PlayerConfig(json.decode(_playerConfigExp.firstMatch(_root.getElementsByTagName('html').first.text)?.group(1)));
 
   String _extractJson(String html, String separator) {
-    return _matchJson(
-        html.substring(html.indexOf(separator) + separator.length));
+    return _matchJson(html.substring(html.indexOf(separator) + separator.length));
   }
 
   String _matchJson(String str) {
@@ -121,8 +96,7 @@ class WatchPage {
   WatchPage(this._root, this.visitorInfoLive, this.ysc);
 
   ///
-  WatchPage.parse(String raw, this.visitorInfoLive, this.ysc)
-      : _root = parser.parse(raw);
+  WatchPage.parse(String raw, this.visitorInfoLive, this.ysc) : _root = parser.parse(raw);
 
   ///
   static Future<WatchPage> get(YoutubeHttpClient httpClient, String videoId) {
@@ -168,12 +142,8 @@ class _StreamInfo extends StreamInfoProvider {
   String get signatureParameter => _root['sp'];
 
   @override
-  int get contentLength => int.tryParse(_root['clen'] ??
-      StreamInfoProvider.contentLenExp
-          .firstMatch(url)
-          .group(1)
-          .nullIfWhitespace ??
-      '');
+  int get contentLength =>
+      int.tryParse(_root['clen'] ?? StreamInfoProvider.contentLenExp.firstMatch(url).group(1).nullIfWhitespace ?? '');
 
   MediaType get mimeType => MediaType.parse(_root['mimeType']);
 
@@ -188,14 +158,12 @@ class _StreamInfo extends StreamInfoProvider {
   @override
   String get videoCodec => isAudioOnly ? null : codecs.first;
 
-  List<String> get codecs =>
-      mimeType.parameters['codecs'].split(',').map((e) => e.trim());
+  List<String> get codecs => mimeType.parameters['codecs'].split(',').map((e) => e.trim());
 
   @override
   String get videoQualityLabel => _root['quality_label'];
 
-  List<int> get _size =>
-      _root['size'].split(',').map((e) => int.tryParse(e ?? ''));
+  List<int> get _size => _root['size'].split(',').map((e) => int.tryParse(e ?? ''));
 
   @override
   int get videoWidth => _size.first;
@@ -213,10 +181,10 @@ class _PlayerConfig {
 
   _PlayerConfig(this._root);
 
-  String get sourceUrl => 'https://youtube.com${_root['assets']['js']}';
+  String get sourceUrl =>
+      _root != null && _root['assets'] != null ? 'https://youtube.com${_root['assets']['js']}' : null;
 
-  PlayerResponse get playerResponse =>
-      PlayerResponse.parse(_root['args']['player_response']);
+  PlayerResponse get playerResponse => PlayerResponse.parse(_root['args']['player_response']);
 
   List<_StreamInfo> get muxedStreams =>
       _root
@@ -227,11 +195,7 @@ class _PlayerConfig {
       const [];
 
   List<_StreamInfo> get adaptiveStreams =>
-      _root
-          .get('args')
-          ?.getValue('adaptive_fmts')
-          ?.split(',')
-          ?.map((e) => _StreamInfo(Uri.splitQueryString(e))) ??
+      _root.get('args')?.getValue('adaptive_fmts')?.split(',')?.map((e) => _StreamInfo(Uri.splitQueryString(e))) ??
       const [];
 
   List<_StreamInfo> get streams => [...muxedStreams, ...adaptiveStreams];
@@ -250,10 +214,8 @@ class _InitialData {
 
   Map<String, dynamic> getContinuationContext(Map<String, dynamic> root) {
     if (root['contents'] != null) {
-      return (root['contents']['twoColumnWatchNextResults']['results']
-              ['results']['contents'] as List<dynamic>)
-          ?.firstWhere((e) => e.containsKey('itemSectionRenderer'))[
-              'itemSectionRenderer']['continuations']
+      return (root['contents']['twoColumnWatchNextResults']['results']['results']['contents'] as List<dynamic>)
+          ?.firstWhere((e) => e.containsKey('itemSectionRenderer'))['itemSectionRenderer']['continuations']
           ?.first['nextContinuationData']
           ?.cast<String, dynamic>();
     }
@@ -265,9 +227,8 @@ class _InitialData {
     return null;
   }
 
-  String get continuation => _continuation ??=
-      getContinuationContext(root)?.getValue('continuation') ?? '';
+  String get continuation => _continuation ??= getContinuationContext(root)?.getValue('continuation') ?? '';
 
-  String get clickTrackingParams => _clickTrackingParams ??=
-      getContinuationContext(root)?.getValue('clickTrackingParams') ?? '';
+  String get clickTrackingParams =>
+      _clickTrackingParams ??= getContinuationContext(root)?.getValue('clickTrackingParams') ?? '';
 }
