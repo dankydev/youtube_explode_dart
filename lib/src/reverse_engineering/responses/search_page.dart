@@ -25,26 +25,21 @@ class SearchPage {
   String _xsrfToken;
 
   ///
-  _InitialData get initialData =>
-      _initialData ??= _InitialData(json.decode(_matchJson(_extractJson(
-          _root
-              .querySelectorAll('script')
-              .map((e) => e.text)
-              .toList()
-              .firstWhere((e) => e.contains('window["ytInitialData"] =')),
-          'window["ytInitialData"] ='))));
+  _InitialData get initialData => _initialData ??= _InitialData(json.decode(_matchJson(_extractJson(
+      _root
+          .querySelectorAll('script')
+          .map((e) => e.text)
+          .toList()
+          .firstWhere((e) => e.contains('window["ytInitialData"] =')),
+      'window["ytInitialData"] ='))));
 
   ///
   String get xsfrToken => _xsrfToken ??= _xsfrTokenExp
-      .firstMatch(_root
-          .querySelectorAll('script')
-          .firstWhere((e) => _xsfrTokenExp.hasMatch(e.text))
-          .text)
+      .firstMatch(_root.querySelectorAll('script').firstWhere((e) => _xsfrTokenExp.hasMatch(e.text)).text)
       .group(1);
 
   String _extractJson(String html, String separator) {
-    return _matchJson(
-        html.substring(html.indexOf(separator) + separator.length));
+    return _matchJson(html.substring(html.indexOf(separator) + separator.length));
   }
 
   String _matchJson(String str) {
@@ -66,8 +61,7 @@ class SearchPage {
   }
 
   ///
-  SearchPage(this._root, this.queryString,
-      [_InitialData initalData, String xsfrToken])
+  SearchPage(this._root, this.queryString, [_InitialData initalData, String xsfrToken])
       : _initialData = initalData,
         _xsrfToken = xsfrToken;
 
@@ -78,17 +72,13 @@ class SearchPage {
       return null;
     }
     return get(httpClient, queryString,
-        ctoken: initialData.continuation,
-        itct: initialData.clickTrackingParams,
-        xsrfToken: xsfrToken);
+        ctoken: initialData.continuation, itct: initialData.clickTrackingParams, xsrfToken: xsfrToken);
   }
 
   ///
-  static Future<SearchPage> get(
-      YoutubeHttpClient httpClient, String queryString,
+  static Future<SearchPage> get(YoutubeHttpClient httpClient, String queryString,
       {String ctoken, String itct, String xsrfToken}) {
-    var url =
-        'https://www.youtube.com/results?search_query=${Uri.encodeQueryComponent(queryString)}';
+    var url = 'https://www.youtube.com/results?search_query=${Uri.encodeQueryComponent(queryString)}';
     if (ctoken != null) {
       assert(itct != null, 'If ctoken is not null itct cannot be null');
       url += '&pbj=1';
@@ -103,8 +93,7 @@ class SearchPage {
       }
       var raw = await httpClient.postString(url, body: body);
       if (ctoken != null) {
-        return SearchPage(
-            null, queryString, _InitialData(json.decode(raw)[1]), xsrfToken);
+        return SearchPage(null, queryString, _InitialData(json.decode(raw)[1]), xsrfToken);
       }
       return SearchPage.parse(raw, queryString);
     });
@@ -130,14 +119,12 @@ class _InitialData {
 
   List<Map<String, dynamic>> getContentContext(Map<String, dynamic> root) {
     if (root['contents'] != null) {
-      return _root['contents']['twoColumnSearchResultsRenderer']
-              ['primaryContents']['sectionListRenderer']['contents']
+      return _root['contents']['twoColumnSearchResultsRenderer']['primaryContents']['sectionListRenderer']['contents']
           .first['itemSectionRenderer']['contents']
           .cast<Map<String, dynamic>>();
     }
     if (root['response'] != null) {
-      return _root['response']['continuationContents']
-              ['itemSectionContinuation']['contents']
+      return _root['response']['continuationContents']['itemSectionContinuation']['contents']
           .cast<Map<String, dynamic>>();
     }
     throw FatalFailureException('Failed to get initial data context.');
@@ -145,16 +132,14 @@ class _InitialData {
 
   Map<String, dynamic> getContinuationContext(Map<String, dynamic> root) {
     if (_root['contents'] != null) {
-      return (_root['contents']['twoColumnSearchResultsRenderer']
-                  ['primaryContents']['sectionListRenderer']['contents']
+      return (_root['contents']['twoColumnSearchResultsRenderer']['primaryContents']['sectionListRenderer']['contents']
               ?.first['itemSectionRenderer']['continuations']
               ?.first as Map)
           ?.getValue('nextContinuationData')
           ?.cast<String, dynamic>();
     }
     if (_root['response'] != null) {
-      return _root['response']['continuationContents']
-              ['itemSectionContinuation']['continuations']
+      return _root['response']['continuationContents']['itemSectionContinuation']['continuations']
           ?.first['nextContinuationData']
           ?.cast<String, dynamic>();
     }
@@ -162,10 +147,8 @@ class _InitialData {
   }
 
   // Contains only [SearchVideo] or [SearchPlaylist]
-  List<dynamic> get searchContent => _searchContent ??= getContentContext(_root)
-      .map(_parseContent)
-      .where((e) => e != null)
-      .toList();
+  List<dynamic> get searchContent =>
+      _searchContent ??= getContentContext(_root).map(_parseContent).where((e) => e != null).toList();
 
   List<RelatedQuery> get relatedQueries =>
       (_relatedQueries ??= getContentContext(_root)
@@ -173,10 +156,8 @@ class _InitialData {
           ?.map((e) => e['horizontalCardListRenderer']['cards'])
           ?.firstOrNull
           ?.map((e) => e['searchRefinementCardRenderer'])
-          ?.map((e) => RelatedQuery(
-              e['searchEndpoint']['searchEndpoint']['query'],
-              VideoId(Uri.parse(e['thumbnail']['thumbnails'].first['url'])
-                  .pathSegments[1])))
+          ?.map((e) => RelatedQuery(e['searchEndpoint']['searchEndpoint']['query'],
+              VideoId(Uri.parse(e['thumbnail']['thumbnails'].first['url']).pathSegments[1])))
           ?.toList()
           ?.cast<RelatedQuery>()) ??
       const [];
@@ -184,18 +165,16 @@ class _InitialData {
   List<dynamic> get relatedVideos =>
       (_relatedVideos ??= getContentContext(_root)
           ?.where((e) => e.containsKey('shelfRenderer'))
-          ?.map((e) =>
-              e['shelfRenderer']['content']['verticalListRenderer']['items'])
+          ?.map((e) => e['shelfRenderer']['content']['verticalListRenderer']['items'])
           ?.firstOrNull
           ?.map(_parseContent)
           ?.toList()) ??
       const [];
 
-  String get continuation => _continuation ??=
-      getContinuationContext(_root)?.getValue('continuation') ?? '';
+  String get continuation => _continuation ??= getContinuationContext(_root)?.getValue('continuation') ?? '';
 
-  String get clickTrackingParams => _clickTrackingParams ??=
-      getContinuationContext(_root)?.getValue('clickTrackingParams') ?? '';
+  String get clickTrackingParams =>
+      _clickTrackingParams ??= getContinuationContext(_root)?.getValue('clickTrackingParams') ?? '';
 
   int get estimatedResults => int.parse(_root['estimatedResults'] ?? 0);
 
@@ -212,29 +191,22 @@ class _InitialData {
           _parseRuns(renderer['ownerText']),
           _parseRuns(renderer['descriptionSnippet']),
           renderer.get('lengthText')?.getValue('simpleText') ?? '',
-          int.parse(renderer['viewCountText']['simpleText']
-                  .toString()
-                  .stripNonDigits()
-                  .nullIfWhitespace ??
+          int.parse((renderer['viewCountText'] != null
+                  ? renderer['viewCountText']['simpleText']?.toString()?.stripNonDigits()?.nullIfWhitespace
+                  : null) ??
               '0'));
     }
     if (content.containsKey('radioRenderer')) {
       var renderer = content['radioRenderer'];
 
-      return SearchPlaylist(
-          PlaylistId(renderer['playlistId']),
-          renderer['title']['simpleText'],
-          int.parse(_parseRuns(renderer['videoCountText'])
-                  .stripNonDigits()
-                  .nullIfWhitespace ??
-              0));
+      return SearchPlaylist(PlaylistId(renderer['playlistId']), renderer['title']['simpleText'],
+          int.parse(_parseRuns(renderer['videoCountText']).stripNonDigits().nullIfWhitespace ?? 0));
     }
     // Here ignore 'horizontalCardListRenderer' & 'shelfRenderer'
     return null;
   }
 
-  String _parseRuns(Map<dynamic, dynamic> runs) =>
-      runs?.getValue('runs')?.map((e) => e['text'])?.join() ?? '';
+  String _parseRuns(Map<dynamic, dynamic> runs) => runs?.getValue('runs')?.map((e) => e['text'])?.join() ?? '';
 }
 
 // ['contents']['twoColumnSearchResultsRenderer']['primaryContents']
