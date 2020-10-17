@@ -13,15 +13,9 @@ void main() {
     });
 
     var data = {
-      '6EWqTym2cQU',
       'SkRSXFQerZs',
+      '6EWqTym2cQU',
       'hySoCSoH-g8',
-      '_kmeFXjjGfk',
-      'MeJVWBSsPAY',
-      '5VGm0dczmHc',
-      'ZGdLIwrGHG8',
-      'rsAAeyAr-9Y',
-      'AI7ULzgf8RU'
     };
     for (var videoId in data) {
       test('GetStreamsOfAnyVideo - $videoId', () async {
