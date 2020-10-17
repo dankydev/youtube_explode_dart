@@ -13,7 +13,7 @@ void main() {
     });
 
     var data = {
-      '9bZkp7q19f0',
+      '6EWqTym2cQU',
       'SkRSXFQerZs',
       'hySoCSoH-g8',
       '_kmeFXjjGfk',
@@ -25,8 +25,15 @@ void main() {
     };
     for (var videoId in data) {
       test('GetStreamsOfAnyVideo - $videoId', () async {
-        var manifest =
-            await yt.videos.streamsClient.getManifest(VideoId(videoId));
+        var manifest = await yt.videos.streamsClient.getManifest(VideoId(videoId));
+
+        var avgBitRate = manifest.audioOnly
+                .map((e) => e.bitrate.bitsPerSecond)
+                .toList()
+                .reduce((value, element) => value + element) /
+            manifest.audioOnly.length;
+        AudioStreamInfo audioStreamInfo =
+            manifest.audioOnly.where((element) => element.bitrate.bitsPerSecond <= avgBitRate).toList().first;
         expect(manifest.streams, isNotEmpty);
       });
     }
@@ -58,8 +65,7 @@ void main() {
         'rsAAeyAr-9Y',
       };
       for (var videoId in data) {
-        var manifest =
-            await yt.videos.streamsClient.getManifest(VideoId(videoId));
+        var manifest = await yt.videos.streamsClient.getManifest(VideoId(videoId));
         for (var streamInfo in manifest.streams) {
           var stream = await yt.videos.streamsClient.get(streamInfo).toList();
           expect(stream, isNotEmpty);

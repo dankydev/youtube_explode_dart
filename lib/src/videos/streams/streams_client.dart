@@ -131,7 +131,9 @@ class StreamsClient {
     // To make sure there are no duplicates streams, group them by tag
     var streams = <int, StreamInfo>{};
 
-    for (var streamInfo in streamContext.streamInfoProviders) {
+    
+
+    for (var streamInfo in streamContext.streamInfoProviders.toList()) {
       var tag = streamInfo.tag;
       var url = Uri.parse(streamInfo.url);
 
@@ -159,54 +161,6 @@ class StreamsClient {
       var bitrate = Bitrate(streamInfo.bitrate);
 
       var audioCodec = streamInfo.audioCodec;
-      var videoCodec = streamInfo.videoCodec;
-
-      // Muxed or Video-only
-      if (!videoCodec.isNullOrWhiteSpace) {
-        var framerate = Framerate(streamInfo.framerate ?? 24);
-        var videoQualityLabel = streamInfo.videoQualityLabel ??
-            VideoQualityUtil.getLabelFromTagWithFramerate(
-                tag, framerate.framesPerSecond);
-
-        var videoQuality = VideoQualityUtil.fromLabel(videoQualityLabel);
-
-        var videoWidth = streamInfo.videoWidth;
-        var videoHeight = streamInfo.videoHeight;
-        var videoResolution = videoWidth != -1 && videoHeight != -1
-            ? VideoResolution(videoWidth, videoHeight)
-            : videoQuality.toVideoResolution();
-
-        // Muxed
-        if (!audioCodec.isNullOrWhiteSpace) {
-          streams[tag] = MuxedStreamInfo(
-              tag,
-              url,
-              container,
-              fileSize,
-              bitrate,
-              audioCodec,
-              videoCodec,
-              videoQualityLabel,
-              videoQuality,
-              videoResolution,
-              framerate);
-          continue;
-        }
-
-        // Video only
-        streams[tag] = VideoOnlyStreamInfo(
-            tag,
-            url,
-            container,
-            fileSize,
-            bitrate,
-            videoCodec,
-            videoQualityLabel,
-            videoQuality,
-            videoResolution,
-            framerate);
-        continue;
-      }
       // Audio-only
       if (!audioCodec.isNullOrWhiteSpace) {
         streams[tag] = AudioOnlyStreamInfo(
@@ -229,8 +183,12 @@ class StreamsClient {
     // In some cases one works, in some cases another does.
 
     try {
+      Stopwatch stopwatch = Stopwatch()..start();
       var context = await _getStreamContextFromVideoInfo(videoId);
-      return _getManifest(context);
+      print("stream context: ${stopwatch.elapsedMilliseconds}");
+      var manifest = await _getManifest(context);
+      print("manifest: ${stopwatch.elapsedMilliseconds}");
+      return manifest;
     } on YoutubeExplodeException {
       var context = await _getStreamContextFromWatchPage(videoId);
       return _getManifest(context);

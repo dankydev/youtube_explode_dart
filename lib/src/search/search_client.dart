@@ -16,40 +16,29 @@ class SearchClient {
   Stream<Video> getVideosAsync(String searchQuery) async* {
     var encounteredVideoIds = <String>{};
 
-    for (var page = 0; page < double.maxFinite; page++) {
-      var response =
-          await PlaylistResponse.searchResults(_httpClient, searchQuery);
+    var response = await PlaylistResponse.searchResults(_httpClient, searchQuery);
 
-      var countDelta = 0;
-      for (var video in response.videos) {
-        var videoId = video.id;
+    for (var video in response.videos) {
+      var videoId = video.id;
 
-        if (!encounteredVideoIds.add(videoId)) {
-          continue;
-        }
-
-        yield Video(
-            VideoId(videoId),
-            video.title,
-            video.author,
-            video.channelId,
-            video.uploadDate,
-            video.description,
-            video.duration,
-            ThumbnailSet(videoId),
-            video.keywords,
-            Engagement(video.viewCount, video.likes, video.dislikes));
-        countDelta++;
+      if (!encounteredVideoIds.add(videoId)) {
+        continue;
       }
 
-      // Videos loop around, so break when we stop seeing new videos
-      if (countDelta <= 0) {
-        break;
-      }
+      yield Video(
+          VideoId(videoId),
+          video.title,
+          video.author,
+          video.channelId,
+          video.uploadDate,
+          video.description,
+          video.duration,
+          ThumbnailSet(videoId),
+          video.keywords,
+          Engagement(video.viewCount, video.likes, video.dislikes));
     }
   }
 
   /// Queries to YouTube to get the results.
-  Future<SearchQuery> queryFromPage(String searchQuery) =>
-      SearchQuery.search(_httpClient, searchQuery);
+  Future<SearchQuery> queryFromPage(String searchQuery) => SearchQuery.search(_httpClient, searchQuery);
 }

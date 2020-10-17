@@ -13,11 +13,13 @@ void main() {
     });
 
     test('SearchYouTubeVideosFromApi', () async {
+      Stopwatch stopwatch = Stopwatch()..start();
       var videos = await yt.search
-          .getVideosAsync('undead corporation megalomania')
+          .getVideosAsync('AC/DC If you want blood')
           .toList();
+      print(stopwatch.elapsedMilliseconds.toString());
       expect(videos, isNotEmpty);
-    }, skip: 'Endpoint removed from YouTube');
+    });
 
     //TODO: Find out why this fails
     test('SearchYouTubeVideosFromPage', () async {
@@ -36,5 +38,6 @@ void main() {
       var nextPage = await query.nextPage();
       expect(nextPage, isNull);
     });
+
   });
 }
