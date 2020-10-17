@@ -28,6 +28,7 @@ void main() {
             manifest.audioOnly.length;
         AudioStreamInfo audioStreamInfo =
             manifest.audioOnly.where((element) => element.bitrate.bitsPerSecond <= avgBitRate).toList().first;
+        print(audioStreamInfo.url);
         expect(manifest.streams, isNotEmpty);
       });
     }

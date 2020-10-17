@@ -70,13 +70,6 @@ class StreamsClient {
       ...videoInfoResponse.streams,
       ...playerResponse.streams
     ];
-
-    var dashManifestUrl = playerResponse.dashManifestUrl;
-    if (!dashManifestUrl.isNullOrWhiteSpace) {
-      var dashManifest =
-          await _getDashManifest(Uri.parse(dashManifestUrl), cipherOperations);
-      streamInfoProviders.addAll(dashManifest.streams);
-    }
     return StreamContext(streamInfoProviders, cipherOperations);
   }
 
@@ -114,21 +107,12 @@ class StreamsClient {
     }
 
     var streamInfoProviders = <StreamInfoProvider>[...playerResponse.streams];
-
-    var dashManifestUrl = playerResponse.dashManifestUrl;
-    if (!dashManifestUrl.isNullOrWhiteSpace) {
-      var dashManifest =
-          await _getDashManifest(Uri.parse(dashManifestUrl), cipherOperations);
-      streamInfoProviders.addAll(dashManifest.streams);
-    }
     return StreamContext(streamInfoProviders, cipherOperations);
   }
 
   Future<StreamManifest> _getManifest(StreamContext streamContext) async {
     // To make sure there are no duplicates streams, group them by tag
     var streams = <int, StreamInfo>{};
-
-    
 
     for (var streamInfo in streamContext.streamInfoProviders.toList()) {
       var tag = streamInfo.tag;
@@ -143,29 +127,16 @@ class StreamsClient {
         url = url.setQueryParam(signatureParameter, signature);
       }
 
-      // Content length
-      var contentLength = streamInfo.contentLength ??
-          await _httpClient.getContentLength(url, validate: false) ??
-          0;
-
-      if (contentLength <= 0) {
-        continue;
-      }
-
       // Common
       var container = StreamContainer.parse(streamInfo.container);
-      var fileSize = FileSize(contentLength);
       var bitrate = Bitrate(streamInfo.bitrate);
 
       var audioCodec = streamInfo.audioCodec;
       // Audio-only
       if (!audioCodec.isNullOrWhiteSpace) {
         streams[tag] = AudioOnlyStreamInfo(
-            tag, url, container, fileSize, bitrate, audioCodec);
+            tag, url, container, null, bitrate, audioCodec);
       }
-
-      // #if DEBUG
-      // throw FatalFailureException("Stream info doesn't contain audio/video codec information.");
     }
 
     return StreamManifest(streams.values);
