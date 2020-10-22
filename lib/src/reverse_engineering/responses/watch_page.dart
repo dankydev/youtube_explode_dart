@@ -33,14 +33,13 @@ class WatchPage {
   _PlayerConfig _playerConfig;
 
   ///
-  _InitialData get initialData =>
-      _initialData ??= _InitialData(WatchPageId.fromRawJson(_extractJson(
-          _root
-              .querySelectorAll('script')
-              .map((e) => e.text)
-              .toList()
-              .firstWhere((e) => e.contains('window["ytInitialData"] =')),
-          'window["ytInitialData"] =')));
+  _InitialData get initialData => _initialData ??= _InitialData(WatchPageId.fromRawJson(_extractJson(
+      _root
+          .querySelectorAll('script')
+          .map((e) => e.text)
+          .toList()
+          .firstWhere((e) => e.contains('window["ytInitialData"] =')),
+      'window["ytInitialData"] =')));
 
   ///
   String get xsfrToken => _xsfrToken ??= _xsfrTokenExp
@@ -68,10 +67,8 @@ class WatchPage {
   static final _playerConfigExp = RegExp(r'ytplayer\.config\s*=\s*(\{.*\}\});');
 
   ///
-  _PlayerConfig get playerConfig => _playerConfig ??= _PlayerConfig(
-      PlayerConfigJson.fromRawJson(_playerConfigExp
-          .firstMatch(_root.getElementsByTagName('html').first.text)
-          ?.group(1)));
+  _PlayerConfig get playerConfig => _playerConfig ??= _PlayerConfig(PlayerConfigJson.fromRawJson(
+      _playerConfigExp.firstMatch(_root.getElementsByTagName('html').first.text)?.group(1)));
 
   String _extractJson(String html, String separator) {
     return _matchJson(html.substring(html.indexOf(separator) + separator.length));
@@ -130,10 +127,9 @@ class _PlayerConfig {
 
   _PlayerConfig(this.root);
 
-  String get sourceUrl => 'https://youtube.com${root.assets.js}';
+  String get sourceUrl => root?.assets == null ? null : 'https://youtube.com${root?.assets?.js}';
 
-  PlayerResponse get playerResponse =>
-      PlayerResponse.parse(root.args.playerResponse);
+  PlayerResponse get playerResponse => PlayerResponse.parse(root.args.playerResponse);
 }
 
 class _InitialData {
@@ -159,9 +155,7 @@ class _InitialData {
     return null;
   }
 
-  String get continuation =>
-      _continuation ??= getContinuationContext()?.continuation ?? '';
+  String get continuation => _continuation ??= getContinuationContext()?.continuation ?? '';
 
-  String get clickTrackingParams => _clickTrackingParams ??=
-      getContinuationContext()?.clickTrackingParams ?? '';
+  String get clickTrackingParams => _clickTrackingParams ??= getContinuationContext()?.clickTrackingParams ?? '';
 }
