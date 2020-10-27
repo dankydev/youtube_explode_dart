@@ -2,15 +2,14 @@ import 'package:test/test.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 void main() {
-  group('Streams', () {
-    YoutubeExplode yt;
-    setUp(() {
-      yt = YoutubeExplode();
-    });
+  YoutubeExplode yt;
+  setUpAll(() {
+    yt = YoutubeExplode();
+  });
 
-    tearDown(() {
-      yt.close();
-    });
+  tearDownAll(() {
+    yt.close();
+  });
 
     var data = {
       'SkRSXFQerZs',
@@ -65,7 +64,7 @@ void main() {
           var stream = await yt.videos.streamsClient.get(streamInfo).toList();
           expect(stream, isNotEmpty);
         }
-      }
-    }, timeout: const Timeout(Duration(minutes: 10)), skip: 'Takes too long.');
+      });
+    }
   });
 }
