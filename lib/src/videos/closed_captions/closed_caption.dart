@@ -1,9 +1,14 @@
 import 'dart:collection';
 
+import 'package:json_annotation/json_annotation.dart';
+
 import 'closed_caption_part.dart';
+
+part 'closed_caption.g.dart';
 
 /// Text that gets displayed at specific time during video playback,
 /// as part of a [ClosedCaptionTrack]
+@JsonSerializable()
 class ClosedCaption {
   /// Text displayed by this caption.
   final String text;
@@ -32,4 +37,14 @@ class ClosedCaption {
   /// Note that some captions may not have any parts at all.
   ClosedCaptionPart getPartByTime(Duration offset) =>
       parts.firstWhere((e) => e.offset >= offset, orElse: () => null);
+
+  @override
+  String toString() => 'Text: $text';
+
+  ///
+  factory ClosedCaption.fromJson(Map<String, dynamic> json) =>
+      _$ClosedCaptionFromJson(json);
+
+  ///
+  Map<String, dynamic> toJson() => _$ClosedCaptionToJson(this);
 }

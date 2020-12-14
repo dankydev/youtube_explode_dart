@@ -21,14 +21,16 @@ void main() {
     });
 
   test('Search a youtube videos from the search page', () async {
+    // ignore: deprecated_member_use_from_same_package
     var searchQuery = await yt.search.queryFromPage('hello');
     expect(searchQuery.content, isNotEmpty);
     expect(searchQuery.relatedVideos, isNotEmpty);
     expect(searchQuery.relatedQueries, isNotEmpty);
-  });
+  }, skip: 'Not supported anymore');
 
   test('Search with no results', () async {
     var query =
+        // ignore: deprecated_member_use_from_same_package
         await yt.search.queryFromPage('g;jghEOGHJeguEPOUIhjegoUEHGOGHPSASG');
     expect(query.content, isEmpty);
     expect(query.relatedQueries, isEmpty);
@@ -38,6 +40,7 @@ void main() {
   });
 
   test('Search youtube videos have thumbnails', () async {
+    // ignore: deprecated_member_use_from_same_package
     var searchQuery = await yt.search.queryFromPage('hello');
     expect(searchQuery.content.first, isA<SearchVideo>());
 
